@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-04-26 13:37:48
- * @LastEditTime: 2020-04-27 03:54:55
+ * @LastEditTime: 2020-04-27 04:35:27
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /ReactNativeVideoPlugin/src/plugin/react-native-video-plugin/index.js
@@ -18,14 +18,18 @@ import {
     Easing,
     Image,
     View,
-    Text
+    Text,
+    Dimensions
 } from 'react-native';
 
+const {width,height} = Dimensions.get("window")
+console.log(width,height)
+console.log(Dimensions.get("screen").width,Dimensions.get("screen").height)
 class VideoPlayer extends Component{
 
     constructor(props){
         super(props)
-        console.log(props,"this props")
+        console.log(props,"this fullscreen props")
         let videoProps = {...props,poster:""}
         this.state = {
             containerWidth:0,
@@ -34,9 +38,9 @@ class VideoPlayer extends Component{
             posterOpacity:1,
             controlShow:false,
             VideoProps:videoProps,
-            poster:this.props.poster?this.props.poster:"",
+            poster:"",
             posterResizeMode:this.props.posterResizeMode?this.props.posterResizeMode:"cover",
-            playStatus:false,
+            playStatus:true,
             posterClickFlag:false,
             duration:0,
             progressBarFillWidth:0,
@@ -47,16 +51,15 @@ class VideoPlayer extends Component{
             currentTime: 0,
             loadFlag:false,
             barDiameter:14,
-            source:this.props.source,
-            fullScreenOpenFlag:false
+            fullScreenSwitch:false
         }
         this.player={
             ref: Video,
             controlTimeout:null,
             seekerWidth:0,
-            seekPanResponder:PanResponder
+            seekPanResponder:PanResponder,
+            fullScreenInterval:null
         }
-        console.log(this.player,"this.player")
         this.onLoad = this.onLoad.bind(this)
         this.containerlayout = this.containerlayout.bind(this)
         this.onVideoAreaTouch = this.onVideoAreaTouch.bind(this)
@@ -69,30 +72,36 @@ class VideoPlayer extends Component{
         this.seekTo = this.seekTo.bind(this)
         this.hideControls = this.hideControls.bind(this)
         this.videPlayEnd = this.videPlayEnd.bind(this)
-        this.clearControlTimeout = this.clearControlTimeout.bind(this)
         this.openFullScreen = this.openFullScreen.bind(this)
+        this.checkFullScreen = this.checkFullScreen.bind(this)
     }
 
-    sendStateToFullScreen(){
-        console.log("in sendStateToFullScreen")
-        console.log(this.props)
-        this.props.fullBridge(this.state)
-    }
 
     openFullScreen(){
-        console.log("in full screen")
-        this.clearControlTimeout()
+        console.log("in openFullScreen")
+        console.log(this.state)
         this.setState({
-            playStatus:false,
-            fullScreenOpenFlag:true
-        },function(){
-            this.props.fullBridge(this.state)
+            fullScreenSwitch:true,
+            VideoProps:{...this.state.videoProps,source:this.props.videoScreenData.source}
         })
     }
 
     UNSAFE_componentWillMount(){
         this.initSeekPanResponder()
-        console.log(this.player)
+    }
+
+    componentDidMount(){
+        let self = this
+        this.player.fullScreenInterval =  setInterval(this.checkFullScreen,100)
+    }
+
+    checkFullScreen(){
+        console.log("检测全屏事件.....")
+        if(this.props.hasOwnProperty("videoScreenData")  && this.props.videoScreenData.fullScreenOpenFlag){
+            this.openFullScreen(this.props)
+            clearInterval(this.player.fullScreenInterval)
+            console.log("检测到全屏事件")
+        }
     }
 
     /**
@@ -406,10 +415,7 @@ class VideoPlayer extends Component{
                             </Text>
                         </View>
                     </View>
-                    <TouchableWithoutFeedback 
-                    style={styles.fullScreenIconArea}
-                    onPress={this.openFullScreen}
-                    >
+                    <TouchableWithoutFeedback style={styles.fullScreenIconArea}>
                         <View style={styles.fullScreenIconArea}> 
                             <Image source={require("./assets/img/fullscreen.png")} style={styles.fullScreenIcon} />
                         </View>
@@ -420,63 +426,99 @@ class VideoPlayer extends Component{
     }
 
     render(){
-        if(this.state.loadFlag){
-            return(
-                <TouchableWithoutFeedback 
-                onLayout={(e)=>this.containerlayout(e)}
-                onPress={ this.onVideoAreaTouch }
-                >
-                    <View style={[styles.container,{height:this.state.containerHeight}]}>
-                        <Video
-                            {...this.state.VideoProps}
-                            style={styles.video}
-                            paused = {!this.state.playStatus}
-                            ref={v=>this.player.ref = v}
-                            onLoad={PayLoad=>this.onLoad(PayLoad)}
-                            onProgress={ this.onProgress }
-                            repeat={false}
-                        />
-                        <View style={[styles.controlArea,{opacity:this.state.controlOpacity}]}>
-                            {this.renderPoster()}
-                            <View style={styles.top}>
-                                <Text style={styles.titleWord}>
-                                    {this.props.title}
-                                </Text>
-                                {this.state.posterClickFlag&& this.props.playAmount?<Text style={styles.littleWord}>
-                                    {this.props.playAmount}
-                                </Text>:<Text></Text>}
+
+        if(this.state.fullScreenSwitch){
+            if(this.state.loadFlag){
+                return(
+                    <TouchableWithoutFeedback 
+                    onLayout={(e)=>this.containerlayout(e)}
+                    onPress={ this.onVideoAreaTouch }
+                    style={styles.fullScreen}
+                    >
+                        <View style={[styles.container,
+                            styles.fullScreen,
+                            {
+                                width:this.state.fullScreenSwitch?height:0,
+                                height:this.state.fullScreenSwitch?width:0,
+                                transform:[{rotate: "90deg" }],
+                                top:-(width - height)/2,
+                                left:(width-height)/2,
+                                position:"absolute"
+                            }
+                            
+                            ]}>
+                            <Video
+                                {...this.state.VideoProps}
+                                style={styles.video}
+                                paused = {!this.state.playStatus}
+                                ref={v=>this.player.ref = v}
+                                onLoad={PayLoad=>this.onLoad(PayLoad)}
+                                onProgress={ this.onProgress }
+                                repeat={false}
+                                resizeMode="cover"
+                            />
+                            <View style={[styles.controlArea,{opacity:this.state.controlOpacity}]}>
+                                {this.renderPoster()}
+                                <View style={styles.top}>
+                                    <Text style={styles.titleWord}>
+                                        {this.props.title}
+                                    </Text>
+                                    {this.state.posterClickFlag&& this.props.playAmount?<Text style={styles.littleWord}>
+                                        {this.props.playAmount}
+                                    </Text>:<Text></Text>}
+                                </View>
+                                {this.renderPlayButton()}
+                                {this.renderBottomArea()}
                             </View>
-                            {this.renderPlayButton()}
-                            {this.renderBottomArea()}
+                            
                         </View>
+                    </TouchableWithoutFeedback>
+                )
+            }else{
+                return(
+                    <TouchableWithoutFeedback 
+                    onLayout={(e)=>this.containerlayout(e)}
+                    onPress={ this.onVideoAreaTouch }
+                    style={styles.fullScreen}
+                    >
+                        <View style={[styles.container,styles.fullScreen,
+                        {
+                            width:this.state.fullScreenSwitch?height:0,
+                            height:this.state.fullScreenSwitch?width:0,
+                            transform:[{rotate: "90deg" }],
+                            top:-(width - height)/2,
+                            left:(width-height)/2,
+                            position:"absolute"
+                        }
                         
-                    </View>
-                </TouchableWithoutFeedback>
-            )
+                        ]}>
+                            <Video
+                                {...this.state.VideoProps}
+                                style={styles.video}
+                                paused = {!this.state.playStatus}
+                                ref={v=>this.player.ref = v}
+                                onLoad={PayLoad=>this.onLoad(PayLoad)}
+                                onProgress={ this.onProgress }
+                                repeat={false}
+                            />
+                            <View style={[styles.controlArea,{opacity:this.state.controlOpacity}]}>
+                                {this.renderPoster()}
+                            </View>
+                            
+                        </View>
+                    </TouchableWithoutFeedback>
+                )
+            }
         }else{
+
             return(
-                <TouchableWithoutFeedback 
-                onLayout={(e)=>this.containerlayout(e)}
-                onPress={ this.onVideoAreaTouch }
-                >
-                    <View style={[styles.container,{height:this.state.containerHeight}]}>
-                        <Video
-                            {...this.state.VideoProps}
-                            style={styles.video}
-                            paused = {!this.state.playStatus}
-                            ref={v=>this.player.ref = v}
-                            onLoad={PayLoad=>this.onLoad(PayLoad)}
-                            onProgress={ this.onProgress }
-                            repeat={false}
-                        />
-                        <View style={[styles.controlArea,{opacity:this.state.controlOpacity}]}>
-                            {this.renderPoster()}
-                        </View>
-                        
-                    </View>
-                </TouchableWithoutFeedback>
+                <View style={styles.fullScreen}>
+
+                </View>
             )
+
         }
+        
     }
 
     formatTime( time = 0 ) {
@@ -503,6 +545,11 @@ export default VideoPlayer
 
 
 const styles = StyleSheet.create({
+    fullScreen:{
+        position:"absolute",
+        backgroundColor:"red",
+        zIndex:999
+    },
     container:{
         flexDirection:"column"
     },

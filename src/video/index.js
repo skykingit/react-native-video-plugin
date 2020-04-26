@@ -20,8 +20,9 @@ export default class VideoScreen extends Component{
                     onBuffer={this.onBuffer}                // Callback when remote video is buffering
                     onError={this.videoError}               // Callback when video cannot be loaded
                     style={styles.backgroundVideo} 
-                    fullscreen="true"
+                    fullscreen={true}
                     resizeMode="cover"
+                    paused={true}
                     />
                 </View>
                 <View style={styles.navArea}>
