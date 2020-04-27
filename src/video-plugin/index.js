@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-04-26 14:00:32
- * @LastEditTime: 2020-04-27 04:34:28
+ * @LastEditTime: 2020-04-27 17:29:36
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /ReactNativeVideoPlugin/src/video-plugin/index.js
@@ -50,7 +50,7 @@ export default class VideoControlsScreen extends Component{
                 />
                 <View style={styles.container}>
                     <View style={styles.videoArea}>
-                        <Video source={VideoSource}   // Can be a URL or a local file.
+                        <Video  // Can be a URL or a local file.
                         ref={(ref) => {
                             this.player = ref
                         }}                                      // Store reference

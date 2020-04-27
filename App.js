@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-04-26 11:50:44
- * @LastEditTime: 2020-04-27 03:18:38
+ * @LastEditTime: 2020-04-27 15:25:55
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /ReactNativeVideoPlugin/App.js
@@ -14,8 +14,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 // import VideoScreen from './src/video'
 // import VideoControlsScreen from './src/video-player'
-import VideoPluginScreen from './src/video-plugin'
+// import VideoPluginScreen from './src/video-plugin'
 // import AnimationScreen from './src/animation'
+import VideoPluginScreen from './src/video-plugin-plus'
 
 
 
@@ -29,7 +30,7 @@ function App() {
         {/* <Stack.Screen name="Video" component={AnimationScreen} />
         <Stack.Screen name="Video" component={VideoScreen} />
         <Stack.Screen name="VideoControls" component={VideoControlsScreen} /> */}
-        <Stack.Screen name="VideoPlugin" component={VideoPluginScreen} />
+        <Stack.Screen name="VideoPlugin" component={VideoPluginScreen} options={{headerShown:false}} />
       </Stack.Navigator>
     </NavigationContainer>
   );
