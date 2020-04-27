@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-04-26 14:00:32
- * @LastEditTime: 2020-04-27 18:06:17
+ * @LastEditTime: 2020-04-27 23:32:03
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /ReactNativeVideoPlugin/src/video-plugin/index.js
@@ -90,6 +90,7 @@ export default class VideoControlsScreen extends Component{
                    renderItem={({item,index})=> <this.renderItem  item={item} index={index} />}
                    initialNumToRender={3}
                    onTouchStart={()=>{this.beginDrag()}}
+                   keyExtractor={item=>item.name}
                    />
 
                </View>
