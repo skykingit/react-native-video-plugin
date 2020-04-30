@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-04-26 14:00:32
- * @LastEditTime: 2020-04-27 23:32:03
+ * @LastEditTime: 2020-04-30 15:00:27
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /ReactNativeVideoPlugin/src/video-plugin/index.js
@@ -43,6 +43,7 @@ export default class VideoControlsScreen extends Component{
     getTargetLayout(index){
         if(this.children[index]){
             this.children[index].measure( (fx, fy, width, height, px, py) => {
+                console.log(fx, fy, width, height, px, py)
                 let newTrackView ={
                     width:width,
                     height:height,
@@ -69,7 +70,31 @@ export default class VideoControlsScreen extends Component{
     }
     render(){
         return(
-            <>
+            <>               
+               <View style={styles.container}>
+                   <FlatList
+                   data={videoListData}
+                   renderItem={({item,index})=> <this.renderItem  item={item} index={index} />}
+                   initialNumToRender={3}
+                   onTouchStart={()=>{this.beginDrag()}}
+                   keyExtractor={item=>item.name}
+                   />
+
+               </View>
+               {/* <View
+                style={{position:"absolute",
+                top:100,
+                left:0,
+                width:100,
+                height:100,
+                backgroundColor:"red",
+                zIndex:9999
+            }}
+
+                >
+
+                </View> */}
+
                 {this.state.trackView&& this.state.trackView.hasOwnProperty("x")?
                 <FullScrren 
                 source={VideoSource}
@@ -84,16 +109,6 @@ export default class VideoControlsScreen extends Component{
                 videoData={this.state.trackView}
                 />:
                 <View></View>}
-               <View style={styles.container}>
-                   <FlatList
-                   data={videoListData}
-                   renderItem={({item,index})=> <this.renderItem  item={item} index={index} />}
-                   initialNumToRender={3}
-                   onTouchStart={()=>{this.beginDrag()}}
-                   keyExtractor={item=>item.name}
-                   />
-
-               </View>
             </>
             
         )

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-04-27 16:17:28
- * @LastEditTime: 2020-04-27 16:17:36
+ * @LastEditTime: 2020-04-29 00:58:53
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /ReactNativeVideoPlugin/src/video-plugin-plus/test.js
@@ -64,6 +64,19 @@ export default class VideoControlsScreen extends Component{
         }
     }
 
+    eleLayout(ref){
+
+            ref.measure( (fx, fy, width, height, px, py) => {
+                console.log('Component width is: ' + width)
+                console.log('Component height is: ' + height)
+                console.log('X offset to frame: ' + fx)
+                console.log('Y offset to frame: ' + fy)
+                console.log('X offset to page: ' + px)
+                console.log('Y offset to page: ' + py)
+
+            }) 
+    }
+
     containerScroll(e){
         // this.getTargetLayout()
     }
@@ -104,15 +117,13 @@ export default class VideoControlsScreen extends Component{
                     <View style={styles.block}></View>
                     <View style={styles.block}></View>
                     <View style={styles.block}></View>
-                    
-                    <TouchableOpacity style={styles.poster} 
-                    onPress={(e)=>this.clickVideoArea(e)}
-                    ref={ref=>this.target=ref}
-                    >
-                        
-                    </TouchableOpacity>
                     <View style={styles.block}></View>
-                    <View style={styles.block}></View>
+                    <View style={styles.cover}>
+                        <TouchableOpacity style={styles.poster} 
+                        onPress={(e)=>this.clickVideoArea(e)}
+                        ref={ref=>this.target=ref}
+                        ></TouchableOpacity>
+                    </View>
                     <View style={styles.block}></View>
                     <View style={styles.block}></View>
                     <View style={styles.block}></View>
@@ -148,5 +159,10 @@ const styles = StyleSheet.create({
     trackView:{
         position:"absolute",
         backgroundColor:"white"
+    },
+    cover:{
+        paddingTop:30,
+        paddingBottom:30,
+        backgroundColor:"blue"
     }
 })

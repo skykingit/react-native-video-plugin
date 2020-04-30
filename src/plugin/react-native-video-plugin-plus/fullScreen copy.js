@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-04-26 13:37:48
- * @LastEditTime: 2020-04-30 15:01:48
+ * @LastEditTime: 2020-04-29 23:00:59
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /ReactNativeVideoPlugin/src/plugin/react-native-video-plugin/index.js
@@ -10,7 +10,6 @@ import React, { Component } from 'react';
 import Video from 'react-native-video';
 import {
     TouchableWithoutFeedback,
-    TouchableOpacity,
     ImageBackground,
     PanResponder,
     StyleSheet,
@@ -23,13 +22,11 @@ import { getStatusBarHeight } from './statusBarHeight';
 
 let {width,height} = Dimensions.get("screen")
 // height -= getStatusBarHeight()
-const VideoSource = require("../../aseets/video/1988.mp4")
-
 class VideoPlayer extends Component{
 
     constructor(props){
         super(props)
-        console.log(props)
+
         let videoProps = {...props,poster:""}
         this.state = {
             controlOpacity:0,
@@ -184,7 +181,7 @@ class VideoPlayer extends Component{
     }
 
     onProgress( data = {} ) {
-        // console.log("onProgress",data)
+        console.log("onProgress",data)
         let state = this.state;
         state.currentTime = data.currentTime;
         // if(data.playableDuration - data.currentTime < 0.2 ){
@@ -371,6 +368,7 @@ class VideoPlayer extends Component{
             </View>
         )
     }
+
     render(){
         let videoLayout = {
             top:this.props.videoData.y,
@@ -396,11 +394,10 @@ class VideoPlayer extends Component{
             }
         }
         return(
-
-                <TouchableOpacity 
-                activeOpacity={1}
-                     onPress={ this.onVideoAreaTouch }
-                style={[styles.container,videoLayout
+            <TouchableWithoutFeedback 
+            onPress={ this.onVideoAreaTouch }
+            >
+                <View style={[styles.container,videoLayout
                    ]}>
                     <Video
                         {...this.state.VideoProps}
@@ -412,7 +409,6 @@ class VideoPlayer extends Component{
                         repeat={false}
                         resizeMode="contain"
                         repeat={true}
-                        source={VideoSource}
                     />
                     <View style={[styles.controlArea,{opacity:this.state.controlOpacity}]}>
                         {this.renderTopArea()}
@@ -420,8 +416,8 @@ class VideoPlayer extends Component{
                         {this.renderBottomArea()}
                     </View>
                     
-                </TouchableOpacity>
-
+                </View>
+            </TouchableWithoutFeedback>
         )        
     }
 
@@ -440,7 +436,7 @@ class VideoPlayer extends Component{
 }
 
 VideoPlayer.defaultProps = {
-    controlDuration:8000,
+    controlDuration:3000,
     playIconSize:50,
     barDiameter:20
 }
